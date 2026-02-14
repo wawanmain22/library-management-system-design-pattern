@@ -1,79 +1,78 @@
 # Library Management System - Design Pattern Implementation
 
-Project ini adalah implementasi sistem manajemen perpustakaan yang menggabungkan 9 design pattern dari 3 kategori: Creational, Structural, dan Behavioral. Project ini dibuat sebagai tugas besar mata kuliah Clean Code dan Design Pattern.
+Tugas Besar Mata Kuliah **Clean Code dan Design Pattern** - Universitas Komputer Indonesia (UNIKOM) 2025.
+
+Implementasi 5 Design Pattern pada domain Library Management System menggunakan bahasa pemrograman Go.
 
 ## Design Patterns yang Diimplementasikan
 
-### Creational Patterns (3)
-1. **Builder Pattern** - Membuat complex Book objects dengan method chaining
-2. **Prototype Pattern** - Cloning book instances untuk multiple copies
-3. **Abstract Factory Pattern** - Membuat berbagai jenis media (Book, Magazine)
+### Creational Patterns (2)
+| No | Pattern | Kegunaan |
+|----|---------|----------|
+| 1 | **Builder** | Membuat objek Book secara fleksibel dengan method chaining dan validasi field wajib |
+| 2 | **Prototype** | Cloning book untuk variasi edisi/lokasi tanpa rebuild dari awal (deep copy) |
 
-### Structural Patterns (3)
-4. **Composite Pattern** - Mengelola category hierarchy
-5. **Decorator Pattern** - Menambahkan fitur ke book secara dinamis
-6. **Proxy Pattern** - Control access ke restricted books
+### Structural Patterns (1)
+| No | Pattern | Kegunaan |
+|----|---------|----------|
+| 3 | **Decorator** | Menambahkan fitur Reserved dan Reference Only secara dinamis tanpa modifikasi class asli |
 
-### Behavioral Patterns (3)
-7. **State Pattern** - Mengelola state transitions book (Available, Borrowed, Overdue)
-8. **Command Pattern** - Encapsulate dan undo operations (Borrow, Return)
-9. **Strategy Pattern** - Multiple search strategies (Title, Author)
+### Behavioral Patterns (2)
+| No | Pattern | Kegunaan |
+|----|---------|----------|
+| 4 | **State** | Mengelola lifecycle buku (Available → Borrowed → Overdue) dengan aturan transisi yang ketat |
+| 5 | **Strategy** | Pencarian buku dengan algoritma yang bisa diganti di runtime (Title Search, Author Search) |
 
 ## Struktur Project
 
 ```
 library-management-system/
-├── main.go                              # Demo program untuk semua patterns
-├── go.mod                                # Go module definition
+├── main.go                                    # Entry point & demo semua patterns
+├── go.mod                                     # Go module definition
+├── Laporan_Design_Pattern.docx                # Laporan tugas besar
 ├── doc/
-│   └── IMPLEMENTATION_NOTES.md            # Dokumentasi detail setiap pattern
+│   ├── IMPLEMENTATION_NOTES.md                # Dokumentasi detail setiap pattern
+│   ├── PATTERN_SUMMARY.md                     # Ringkasan hubungan antar pattern
+│   ├── class-diagram-*.png                    # Class diagram per pattern
+│   └── txt/                                   # Source code & output per pattern (txt)
+│       ├── 1_builder_code.txt
+│       ├── 1_builder_output.txt
+│       ├── 2_prototype_code.txt
+│       ├── 2_prototype_output.txt
+│       ├── 3_decorator_code.txt
+│       ├── 3_decorator_output.txt
+│       ├── 4_state_code.txt
+│       ├── 4_state_output.txt
+│       ├── 5_strategy_code.txt
+│       └── 5_strategy_output.txt
 ├── patterns/
 │   ├── creational/
 │   │   ├── builder/
-│   │   │   ├── book.go                   # Book struct
-│   │   │   └── book_builder.go           # Builder dengan method chaining
-│   │   ├── prototype/
-│   │   │   ├── book.go                  # Book dengan Clone() method
-│   │   │   └── prototype.go             # PrototypeManager
-│   │   └── abstract_factory/
-│   │       ├── media_item.go             # MediaItem interface
-│   │       ├── media_factory.go          # FactoryProducer
-│   │       ├── book_factory.go           # Concrete factory untuk Book
-│   │       └── magazine_factory.go       # Concrete factory untuk Magazine
+│   │   │   ├── book.go                        # Book struct dengan properti lengkap
+│   │   │   └── book_builder.go                # Builder dengan method chaining & validasi
+│   │   └── prototype/
+│   │       ├── book.go                        # Book dengan Clone() deep copy
+│   │       └── prototype.go                   # PrototypeManager untuk registry
 │   ├── structural/
-│   │   ├── composite/
-│   │   │   ├── library_item.go          # Interface untuk composite
-│   │   │   ├── book.go                 # Leaf node
-│   │   │   └── category.go             # Composite node
-│   │   ├── decorator/
-│   │   │   ├── book.go                 # Base Book
-│   │   │   ├── book_decorator.go        # Decorator interface
-│   │   │   ├── reserved_decorator.go     # Reserved flag decorator
-│   │   │   └── reference_only_decorator.go # Reference only decorator
-│   │   └── proxy/
-│   │       ├── book.go                 # Real Book
-│   │       ├── book_proxy.go           # Proxy dengan access control
-│   │       └── user.go                # User dengan tier
+│   │   └── decorator/
+│   │       ├── book.go                        # Base Book (Concrete Component)
+│   │       ├── book_decorator.go              # BookComponent interface & BaseDecorator
+│   │       ├── reserved_decorator.go          # Reserved book decorator
+│   │       └── reference_only_decorator.go    # Reference only decorator
 │   └── behavioral/
 │       ├── state/
-│       │   ├── book_state.go           # State interface
-│       │   ├── available_state.go      # Available state
-│       │   ├── borrowed_state.go       # Borrowed state
-│       │   ├── overdue_state.go        # Overdue state
-│       │   └── book.go               # Context
-│       ├── command/
-│       │   ├── command.go             # Command interface
-│       │   ├── borrow_command.go      # Borrow command
-│       │   ├── return_command.go      # Return command
-│       │   ├── invoker.go            # Command invoker
-│       │   └── receiver.go           # Library receiver
+│       │   ├── book_state.go                  # BookState interface
+│       │   ├── book.go                        # Book context
+│       │   ├── available_state.go             # Available state
+│       │   ├── borrowed_state.go              # Borrowed state
+│       │   └── overdue_state.go               # Overdue state
 │       └── strategy/
-│           ├── search_strategy.go      # Strategy interface
-│           ├── title_search.go        # Search by title
-│           ├── author_search.go       # Search by author
-│           ├── catalog.go            # Catalog dengan strategy
-│           └── book.go              # Book struct
-└── README.md                        # File ini
+│           ├── search_strategy.go             # SearchStrategy interface
+│           ├── book.go                        # Book data model
+│           ├── title_search.go                # Title search strategy
+│           ├── author_search.go               # Author search strategy
+│           └── catalog.go                     # Catalog context
+└── README.md
 ```
 
 ## Cara Menjalankan
@@ -81,122 +80,83 @@ library-management-system/
 ### Prerequisites
 - Go 1.25 atau lebih tinggi
 
-### Running the Program
+### Run Program
 
-1. Clone atau download project
-2. Masuk ke directory project:
-   ```bash
-   cd library-management-system
-   ```
+```bash
+# Clone repository
+git clone https://github.com/wawanmain22/library-management-system-design-pattern.git
+cd library-management-system-design-pattern
 
-3. Install dependencies:
-   ```bash
-   go mod tidy
-   ```
+# Install dependencies
+go mod tidy
 
-4. Run the program:
-   ```bash
-   go run main.go
-   ```
+# Jalankan program
+go run main.go
+```
 
-Program akan menampilkan demo untuk setiap design pattern secara sequential.
+### Build Binary
+
+```bash
+go build -o library-system main.go
+./library-system
+```
 
 ## Output Program
 
-Program menghasilkan output yang mencakup:
+Program menampilkan demo untuk setiap pattern secara sequential:
 
-1. **Builder Pattern Demo**
-   - Pembuatan buku lengkap dengan semua field
-   - Pembuatan buku partial
-   - Validasi error untuk field wajib
+### 1. Builder Pattern
+- Pembuatan buku lengkap dengan semua field dan tags
+- Pembuatan buku partial (field wajib saja)
+- Validasi error ketika field wajib kosong
+- Verifikasi ID unik per buku
 
-2. **Prototype Pattern Demo**
-   - Registrasi prototype
-   - Cloning book dan modifikasi
-   - Verifikasi original tidak terpengaruh
+### 2. Prototype Pattern
+- Registrasi prototype ke PrototypeManager
+- Cloning dan modifikasi clone (ISBN, Price, Stock)
+- Verifikasi original tidak terpengaruh (deep copy)
 
-3. **Abstract Factory Demo**
-   - Pembuatan Book menggunakan BookFactory
-   - Pembuatan Magazine menggunakan MagazineFactory
-   - Switch factory di runtime
+### 3. Decorator Pattern
+- Base book dengan CanBorrow() = true
+- Reserved decorator: CanBorrow() = false
+- Reference Only decorator: CanBorrow() = false, CanReadInLibrary() = true
+- GetDetails() menampilkan info tambahan dari decorator
 
-4. **Composite Pattern Demo**
-   - Membuat category hierarchy
-   - Display hierarchy tree
-   - Total count calculation
-   - Search dalam hierarchy
+### 4. State Pattern
+- State awal: Available
+- Borrow → state berubah ke Borrowed
+- Borrow lagi → error (sudah dipinjam)
+- MarkOverdue → state berubah ke Overdue
+- Return → state kembali ke Available
+- Return lagi → error (sudah available)
 
-5. **Decorator Pattern Demo**
-   - Base book functionality
-   - Decorate dengan Reserved
-   - Decorate dengan Reference Only
-   - Behavior changes
-
-6. **Proxy Pattern Demo**
-   - Student akses public book
-   - Student akses restricted book
-   - Faculty akses restricted book
-   - Access log display
-
-7. **State Pattern Demo**
-   - Borrow available book
-   - State transition Available -> Borrowed
-   - Mark overdue
-   - Return book
-   - Invalid state transitions
-
-8. **Command Pattern Demo**
-   - Execute borrow commands
-   - Execute return command
-   - Undo operation
-   - Command history
-
-9. **Strategy Pattern Demo**
-   - Search by title
-   - Switch ke author search
-   - Display hasil berbeda
-   - Multiple search queries
-
-## Dokumentasi
-
-Untuk dokumentasi detail setiap pattern, class diagram, dan penjelasan implementasi, lihat:
-- `doc/IMPLEMENTATION_NOTES.md`
-
-Dokumentasi mencakup:
-- Alasan pemilihan setiap pattern
-- Class diagram (ASCII art)
-- Detail implementasi
-- Testing scenarios
-- Hubungan antar pattern
+### 5. Strategy Pattern
+- Title Search: query "Clean" → 2 hasil
+- Author Search: query "Robert" → 2 hasil
+- Switch strategy ke Title Search: query "Design" → 1 hasil
 
 ## Teknologi
 
-- **Language**: Go (Golang) 1.25+
-- **No External Dependencies**: Menggunakan hanya standard library Go
+- **Bahasa**: Go (Golang) 1.25+
+- **Dependencies**: Standard library only (tidak ada external dependencies)
+- **Paradigma**: Interface-based design, composition over inheritance
 
 ## Clean Code Principles
 
-Project ini mengikuti prinsip clean code:
-- **Single Responsibility**: Setiap struct memiliki satu tanggung jawab
-- **Open/Closed**: Pattern memungkinkan ekstensi tanpa modifikasi
-- **Liskov Substitution**: Interface bisa digantikan dengan implementasi
+Project ini mengikuti prinsip SOLID:
+- **Single Responsibility**: Setiap file dan struct memiliki satu tanggung jawab
+- **Open/Closed**: Pattern memungkinkan ekstensi tanpa modifikasi kode existing
+- **Liskov Substitution**: Concrete types dapat menggantikan interface
 - **Interface Segregation**: Interface terfokus dan minimal
-- **Dependency Inversion**: Depend pada abstraksi (interface), bukan concrete
-
-## Design Pattern Selection Rationale
-
-Pattern dipilih berdasarkan:
-- **Relevance**: Sesuai dengan domain Library Management System
-- **Practicality**: Memiliki manfaat nyata dalam sistem
-- **Educational Value**: Memberikan pemahaman berbagai kategori pattern
-- **Go Idiomatic**: Cocok dengan pendekatan Go (interface-based design)
+- **Dependency Inversion**: Bergantung pada abstraksi (interface), bukan concrete
 
 ## Author
 
-Nama: [ISI NAMA ANDA]
-Kelas: 2025/2026 Gasal - Clean Code Dan Design Pattern
-Dosen: Alif Finandhita, S.Kom, M.T
+**Ridwan Syarif Abidin** (10122053)
+Teknik Informatika - Universitas Komputer Indonesia
+Mata Kuliah: Clean Code dan Design Pattern
+Dosen Pengampu: Alif Finandhita, S.Kom, M.T
 
 ## License
 
-Project ini dibuat untuk keperluan tugas kuliah.
+Project ini dibuat untuk keperluan Tugas Besar mata kuliah Clean Code dan Design Pattern, UNIKOM 2025.
