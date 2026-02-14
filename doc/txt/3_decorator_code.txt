@@ -1,0 +1,249 @@
+// ============================================================
+// DECORATOR PATTERN - Source Code
+// Library Management System
+// ============================================================
+
+// ============================================================
+// File: patterns/structural/decorator/book_decorator.go
+// ============================================================
+package decorator
+
+// BookComponent interface defines the Component in Decorator pattern
+// Both concrete component (Book) and decorators implement this interface
+type BookComponent interface {
+	GetTitle() string
+	GetAuthor() string
+	GetISBN() string
+	GetDetails() string
+	CanBorrow() bool
+	CanReadInLibrary() bool
+	Borrow()
+	Return()
+}
+
+// BaseBookDecorator provides default delegation to the wrapped component
+// Concrete decorators embed this struct and override only the methods they need
+type BaseBookDecorator struct {
+	Component BookComponent
+}
+
+// GetTitle delegates to the wrapped component
+func (d *BaseBookDecorator) GetTitle() string {
+	return d.Component.GetTitle()
+}
+
+// GetAuthor delegates to the wrapped component
+func (d *BaseBookDecorator) GetAuthor() string {
+	return d.Component.GetAuthor()
+}
+
+// GetISBN delegates to the wrapped component
+func (d *BaseBookDecorator) GetISBN() string {
+	return d.Component.GetISBN()
+}
+
+// GetDetails delegates to the wrapped component
+func (d *BaseBookDecorator) GetDetails() string {
+	return d.Component.GetDetails()
+}
+
+// CanBorrow delegates to the wrapped component
+func (d *BaseBookDecorator) CanBorrow() bool {
+	return d.Component.CanBorrow()
+}
+
+// CanReadInLibrary delegates to the wrapped component
+func (d *BaseBookDecorator) CanReadInLibrary() bool {
+	return d.Component.CanReadInLibrary()
+}
+
+// Borrow delegates to the wrapped component
+func (d *BaseBookDecorator) Borrow() {
+	d.Component.Borrow()
+}
+
+// Return delegates to the wrapped component
+func (d *BaseBookDecorator) Return() {
+	d.Component.Return()
+}
+
+// ============================================================
+// File: patterns/structural/decorator/book.go
+// ============================================================
+package decorator
+
+import "fmt"
+
+// Book represents a base book
+type Book struct {
+	Title     string
+	Author    string
+	ISBN      string
+	Publisher string
+	Copies    int
+}
+
+// GetTitle returns the book title
+func (b *Book) GetTitle() string {
+	return b.Title
+}
+
+// GetAuthor returns the book author
+func (b *Book) GetAuthor() string {
+	return b.Author
+}
+
+// GetISBN returns the book ISBN
+func (b *Book) GetISBN() string {
+	return b.ISBN
+}
+
+// GetDetails returns book details
+func (b *Book) GetDetails() string {
+	return fmt.Sprintf("Book{Title: %s, Author: %s, ISBN: %s, Copies: %d}",
+		b.Title, b.Author, b.ISBN, b.Copies)
+}
+
+// CanBorrow checks if the book can be borrowed
+func (b *Book) CanBorrow() bool {
+	return b.Copies > 0
+}
+
+// CanReadInLibrary checks if the book can be read in the library
+func (b *Book) CanReadInLibrary() bool {
+	return true
+}
+
+// Borrow reduces the number of available copies
+func (b *Book) Borrow() {
+	if b.Copies > 0 {
+		b.Copies--
+	}
+}
+
+// Return increases the number of available copies
+func (b *Book) Return() {
+	b.Copies++
+}
+
+// ============================================================
+// File: patterns/structural/decorator/reserved_decorator.go
+// ============================================================
+package decorator
+
+import "fmt"
+
+// ReservedBookDecorator wraps a book with reservation functionality
+// Embeds BaseBookDecorator for default delegation, overrides only changed behavior
+type ReservedBookDecorator struct {
+	BaseBookDecorator
+	reservedBy string
+}
+
+// NewReservedBookDecorator creates a new reserved book decorator
+func NewReservedBookDecorator(book BookComponent, reservedBy string) *ReservedBookDecorator {
+	return &ReservedBookDecorator{
+		BaseBookDecorator: BaseBookDecorator{Component: book},
+		reservedBy:        reservedBy,
+	}
+}
+
+// GetDetails returns the book details with reservation info
+func (rbd *ReservedBookDecorator) GetDetails() string {
+	return fmt.Sprintf("%s [Reserved by: %s]", rbd.Component.GetDetails(), rbd.reservedBy)
+}
+
+// CanBorrow returns false because a reserved book cannot be borrowed by others
+func (rbd *ReservedBookDecorator) CanBorrow() bool {
+	return false
+}
+
+// Borrow is not allowed for reserved books
+func (rbd *ReservedBookDecorator) Borrow() {
+	fmt.Println("Cannot borrow a reserved book")
+}
+
+// Return is not allowed for reserved books
+func (rbd *ReservedBookDecorator) Return() {
+	fmt.Println("Cannot return a reserved book")
+}
+
+// GetReservedBy returns who reserved the book
+func (rbd *ReservedBookDecorator) GetReservedBy() string {
+	return rbd.reservedBy
+}
+
+// ============================================================
+// File: patterns/structural/decorator/reference_only_decorator.go
+// ============================================================
+package decorator
+
+import "fmt"
+
+// ReferenceOnlyBookDecorator wraps a book that can only be read in the library
+// Embeds BaseBookDecorator for default delegation, overrides only changed behavior
+type ReferenceOnlyBookDecorator struct {
+	BaseBookDecorator
+}
+
+// NewReferenceOnlyBookDecorator creates a new reference only book decorator
+func NewReferenceOnlyBookDecorator(book BookComponent) *ReferenceOnlyBookDecorator {
+	return &ReferenceOnlyBookDecorator{
+		BaseBookDecorator: BaseBookDecorator{Component: book},
+	}
+}
+
+// GetDetails returns the book details with reference only info
+func (robd *ReferenceOnlyBookDecorator) GetDetails() string {
+	return fmt.Sprintf("%s [Reference Only]", robd.Component.GetDetails())
+}
+
+// CanBorrow returns false for reference only books
+func (robd *ReferenceOnlyBookDecorator) CanBorrow() bool {
+	return false
+}
+
+// CanReadInLibrary returns true for reference only books
+func (robd *ReferenceOnlyBookDecorator) CanReadInLibrary() bool {
+	return true
+}
+
+// Borrow is not allowed for reference only books
+func (robd *ReferenceOnlyBookDecorator) Borrow() {
+	fmt.Println("Cannot borrow a reference only book")
+}
+
+// Return is not allowed for reference only books
+func (robd *ReferenceOnlyBookDecorator) Return() {
+	fmt.Println("Cannot return a reference only book")
+}
+
+// ============================================================
+// File: main.go - demoDecoratorPattern()
+// ============================================================
+func demoDecoratorPattern() {
+	fmt.Println("=== DECORATOR PATTERN ===")
+	fmt.Println("Adding features to books using Decorator pattern")
+
+	baseBook := &decorator.Book{
+		Title:     "The Catcher in the Rye",
+		Author:    "J.D. Salinger",
+		ISBN:      "9780316769488",
+		Publisher: "Little, Brown and Company",
+		Copies:    3,
+	}
+
+	fmt.Printf("Base book: %s\n", baseBook.GetDetails())
+	fmt.Printf("Can borrow: %t\n", baseBook.CanBorrow())
+	fmt.Printf("Can read in library: %t\n", baseBook.CanReadInLibrary())
+
+	reservedBook := decorator.NewReservedBookDecorator(baseBook, "student-123")
+	fmt.Printf("\nReserved book: %s\n", reservedBook.GetDetails())
+	fmt.Printf("Can borrow: %t\n", reservedBook.CanBorrow())
+	fmt.Printf("Can read in library: %t\n", reservedBook.CanReadInLibrary())
+
+	referenceBook := decorator.NewReferenceOnlyBookDecorator(baseBook)
+	fmt.Printf("\nReference only book: %s\n", referenceBook.GetDetails())
+	fmt.Printf("Can borrow: %t\n", referenceBook.CanBorrow())
+	fmt.Printf("Can read in library: %t\n", referenceBook.CanReadInLibrary())
+}

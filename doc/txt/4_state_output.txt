@@ -1,0 +1,16 @@
+=== STATE PATTERN ===
+Managing book states using State pattern
+Book: The Alchemist (ISBN: 9780062315007)
+  Current State: Available
+Book 'The Alchemist' is now borrowed
+Book: The Alchemist (ISBN: 9780062315007)
+  Current State: Borrowed
+Error: cannot borrow a book that is already borrowed
+Book is now overdue
+Book: The Alchemist (ISBN: 9780062315007)
+  Current State: Overdue
+Error: cannot borrow an overdue book
+Book is now available (returned from overdue)
+Book: The Alchemist (ISBN: 9780062315007)
+  Current State: Available
+Error: cannot return a book that is already available

@@ -1,0 +1,22 @@
+# Binary
+library-system
+*.exe
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temp Word files
+~$*
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Coverage
+coverage.out
+
+# Agent config (local)
+AGENTS.md

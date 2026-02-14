@@ -1,0 +1,6 @@
+=== PROTOTYPE PATTERN ===
+Creating book copies using Prototype pattern
+Original book: Book{ID: BK-001, Title: Design Patterns, Author: Erich Gamma, ISBN: 9780201633610, Price: 45.99, Stock: 10}
+Cloned book 1: Book{ID: BK-C1, Title: Design Patterns, Author: Erich Gamma, ISBN: 9780201633611, Price: 50.99, Stock: 10}
+Cloned book 2: Book{ID: BK-C2, Title: Design Patterns, Author: Erich Gamma, ISBN: 9780201633610, Price: 45.99, Stock: 5}
+Original book after clones: Book{ID: BK-001, Title: Design Patterns, Author: Erich Gamma, ISBN: 9780201633610, Price: 45.99, Stock: 10}

@@ -1,0 +1,13 @@
+=== DECORATOR PATTERN ===
+Adding features to books using Decorator pattern
+Base book: Book{Title: The Catcher in the Rye, Author: J.D. Salinger, ISBN: 9780316769488, Copies: 3}
+Can borrow: true
+Can read in library: true
+
+Reserved book: Book{Title: The Catcher in the Rye, Author: J.D. Salinger, ISBN: 9780316769488, Copies: 3} [Reserved by: student-123]
+Can borrow: false
+Can read in library: true
+
+Reference only book: Book{Title: The Catcher in the Rye, Author: J.D. Salinger, ISBN: 9780316769488, Copies: 3} [Reference Only]
+Can borrow: false
+Can read in library: true

@@ -1,0 +1,251 @@
+// ============================================================
+// STATE PATTERN - Source Code
+// Library Management System
+// ============================================================
+
+// ============================================================
+// File: patterns/behavioral/state/book_state.go
+// ============================================================
+package state
+
+// BookState interface defines methods for all book states
+type BookState interface {
+	Borrow(book *Book) error
+	Return(book *Book) error
+	MarkOverdue(book *Book) error
+	GetStateName() string
+}
+
+// ============================================================
+// File: patterns/behavioral/state/book.go
+// ============================================================
+package state
+
+import "fmt"
+
+// Book is the context that maintains current state
+type Book struct {
+	title string
+	isbn  string
+	state BookState
+}
+
+// NewBook creates a new book with available state
+func NewBook(title, isbn string) *Book {
+	return &Book{
+		title: title,
+		isbn:  isbn,
+		state: NewAvailableState(),
+	}
+}
+
+// GetTitle returns book title
+func (b *Book) GetTitle() string {
+	return b.title
+}
+
+// GetISBN returns book ISBN
+func (b *Book) GetISBN() string {
+	return b.isbn
+}
+
+// SetState changes the current state
+func (b *Book) SetState(state BookState) {
+	b.state = state
+}
+
+// GetState returns the current state
+func (b *Book) GetState() BookState {
+	return b.state
+}
+
+// Borrow attempts to borrow the book
+func (b *Book) Borrow() error {
+	return b.state.Borrow(b)
+}
+
+// Return attempts to return the book
+func (b *Book) Return() error {
+	return b.state.Return(b)
+}
+
+// MarkOverdue attempts to mark the book as overdue
+func (b *Book) MarkOverdue() error {
+	return b.state.MarkOverdue(b)
+}
+
+// GetStateName returns the current state name
+func (b *Book) GetStateName() string {
+	return b.state.GetStateName()
+}
+
+// Display displays book information with current state
+func (b *Book) Display() {
+	fmt.Printf("Book: %s (ISBN: %s)\n", b.title, b.isbn)
+	fmt.Printf("  Current State: %s\n", b.GetStateName())
+}
+
+// ============================================================
+// File: patterns/behavioral/state/available_state.go
+// ============================================================
+package state
+
+import "fmt"
+
+// AvailableState represents when a book is available for borrowing
+type AvailableState struct{}
+
+// NewAvailableState creates a new available state
+func NewAvailableState() *AvailableState {
+	return &AvailableState{}
+}
+
+// Borrow allows borrowing book
+func (as *AvailableState) Borrow(book *Book) error {
+	if book != nil {
+		book.SetState(NewBorrowedState())
+		fmt.Printf("Book '%s' is now borrowed\n", book.GetTitle())
+	}
+	return nil
+}
+
+// Return is invalid for available books
+func (as *AvailableState) Return(book *Book) error {
+	return fmt.Errorf("cannot return a book that is already available")
+}
+
+// MarkOverdue is invalid for available books
+func (as *AvailableState) MarkOverdue(book *Book) error {
+	return fmt.Errorf("cannot mark an available book as overdue")
+}
+
+// GetStateName returns state name
+func (as *AvailableState) GetStateName() string {
+	return "Available"
+}
+
+// ============================================================
+// File: patterns/behavioral/state/borrowed_state.go
+// ============================================================
+package state
+
+import "fmt"
+
+// BorrowedState represents when a book is borrowed
+type BorrowedState struct{}
+
+// NewBorrowedState creates a new borrowed state
+func NewBorrowedState() *BorrowedState {
+	return &BorrowedState{}
+}
+
+// Borrow is invalid for borrowed books
+func (bs *BorrowedState) Borrow(book *Book) error {
+	return fmt.Errorf("cannot borrow a book that is already borrowed")
+}
+
+// Return allows returning book
+func (bs *BorrowedState) Return(book *Book) error {
+	if book != nil {
+		book.SetState(NewAvailableState())
+		fmt.Printf("Book is now available\n")
+	}
+	return nil
+}
+
+// MarkOverdue marks book as overdue
+func (bs *BorrowedState) MarkOverdue(book *Book) error {
+	if book != nil {
+		book.SetState(NewOverdueState())
+		fmt.Printf("Book is now overdue\n")
+	}
+	return nil
+}
+
+// GetStateName returns state name
+func (bs *BorrowedState) GetStateName() string {
+	return "Borrowed"
+}
+
+// ============================================================
+// File: patterns/behavioral/state/overdue_state.go
+// ============================================================
+package state
+
+import "fmt"
+
+// OverdueState represents when a book is overdue
+type OverdueState struct{}
+
+// NewOverdueState creates a new overdue state
+func NewOverdueState() *OverdueState {
+	return &OverdueState{}
+}
+
+// Borrow is invalid for overdue books
+func (os *OverdueState) Borrow(book *Book) error {
+	return fmt.Errorf("cannot borrow an overdue book")
+}
+
+// Return allows returning book
+func (os *OverdueState) Return(book *Book) error {
+	if book != nil {
+		book.SetState(NewAvailableState())
+		fmt.Printf("Book is now available (returned from overdue)\n")
+	}
+	return nil
+}
+
+// MarkOverdue is invalid for already overdue books
+func (os *OverdueState) MarkOverdue(book *Book) error {
+	return fmt.Errorf("book is already overdue")
+}
+
+// GetStateName returns state name
+func (os *OverdueState) GetStateName() string {
+	return "Overdue"
+}
+
+// ============================================================
+// File: main.go - demoStatePattern()
+// ============================================================
+func demoStatePattern() {
+	fmt.Println("=== STATE PATTERN ===")
+	fmt.Println("Managing book states using State pattern")
+
+	book := state.NewBook("The Alchemist", "9780062315007")
+	book.Display()
+
+	err := book.Borrow()
+	if err != nil {
+		fmt.Printf("Error: %s\n", err)
+	}
+	book.Display()
+
+	err = book.Borrow()
+	if err != nil {
+		fmt.Printf("Error: %s\n", err)
+	}
+
+	err = book.MarkOverdue()
+	if err != nil {
+		fmt.Printf("Error: %s\n", err)
+	}
+	book.Display()
+
+	err = book.Borrow()
+	if err != nil {
+		fmt.Printf("Error: %s\n", err)
+	}
+
+	err = book.Return()
+	if err != nil {
+		fmt.Printf("Error: %s\n", err)
+	}
+	book.Display()
+
+	err = book.Return()
+	if err != nil {
+		fmt.Printf("Error: %s\n", err)
+	}
+}

@@ -1,0 +1,148 @@
+// ============================================================
+// PROTOTYPE PATTERN - Source Code
+// Library Management System
+// ============================================================
+
+// ============================================================
+// File: patterns/creational/prototype/book.go
+// ============================================================
+package prototype
+
+import "fmt"
+
+// cloneCounter is a global counter to generate unique IDs for cloned books
+var cloneCounter int
+
+// Prototype interface defines the Clone method
+type Prototype interface {
+	Clone() Prototype
+	GetDetails() string
+}
+
+// Book represents a book that can be cloned
+type Book struct {
+	ID        string
+	Title     string
+	Author    string
+	ISBN      string
+	Publisher string
+	Category  string
+	Price     float64
+	Stock     int
+}
+
+// Clone creates a deep copy of the book with a new unique ID
+func (b *Book) Clone() Prototype {
+	cloneCounter++
+	newBook := &Book{
+		ID:        fmt.Sprintf("BK-C%d", cloneCounter),
+		Title:     b.Title,
+		Author:    b.Author,
+		ISBN:      b.ISBN,
+		Publisher: b.Publisher,
+		Category:  b.Category,
+		Price:     b.Price,
+		Stock:     b.Stock,
+	}
+	return newBook
+}
+
+// GetDetails returns a string representation of the book
+func (b *Book) GetDetails() string {
+	return fmt.Sprintf("Book{ID: %s, Title: %s, Author: %s, ISBN: %s, Price: %.2f, Stock: %d}",
+		b.ID, b.Title, b.Author, b.ISBN, b.Price, b.Stock)
+}
+
+// UpdateISBN updates the ISBN of the book
+func (b *Book) UpdateISBN(isbn string) {
+	b.ISBN = isbn
+}
+
+// UpdatePrice updates the price of the book
+func (b *Book) UpdatePrice(price float64) {
+	b.Price = price
+}
+
+// UpdateStock updates the stock of the book
+func (b *Book) UpdateStock(stock int) {
+	b.Stock = stock
+}
+
+// ============================================================
+// File: patterns/creational/prototype/prototype.go
+// ============================================================
+package prototype
+
+import "fmt"
+
+// PrototypeManager manages prototypes for easy cloning
+type PrototypeManager struct {
+	prototypes map[string]Prototype
+}
+
+// NewPrototypeManager creates a new PrototypeManager
+func NewPrototypeManager() *PrototypeManager {
+	return &PrototypeManager{
+		prototypes: make(map[string]Prototype),
+	}
+}
+
+// RegisterPrototype registers a prototype with a key
+func (pm *PrototypeManager) RegisterPrototype(key string, proto Prototype) {
+	pm.prototypes[key] = proto
+}
+
+// GetPrototype retrieves and clones a prototype by key
+func (pm *PrototypeManager) GetPrototype(key string) (Prototype, error) {
+	proto, exists := pm.prototypes[key]
+	if !exists {
+		return nil, fmt.Errorf("prototype with key '%s' not found", key)
+	}
+	return proto.Clone(), nil
+}
+
+// ListPrototypes returns all registered prototype keys
+func (pm *PrototypeManager) ListPrototypes() []string {
+	keys := make([]string, 0, len(pm.prototypes))
+	for k := range pm.prototypes {
+		keys = append(keys, k)
+	}
+	return keys
+}
+
+// ============================================================
+// File: main.go - demoPrototypePattern()
+// ============================================================
+func demoPrototypePattern() {
+	fmt.Println("=== PROTOTYPE PATTERN ===")
+	fmt.Println("Creating book copies using Prototype pattern")
+
+	manager := prototype.NewPrototypeManager()
+
+	originalBook := &prototype.Book{
+		ID:        "BK-001",
+		Title:     "Design Patterns",
+		Author:    "Erich Gamma",
+		ISBN:      "9780201633610",
+		Publisher: "Addison-Wesley",
+		Category:  "Technology",
+		Price:     45.99,
+		Stock:     10,
+	}
+
+	manager.RegisterPrototype("design-patterns", originalBook)
+	fmt.Printf("Original book: %s\n", originalBook.GetDetails())
+
+	clone1, _ := manager.GetPrototype("design-patterns")
+	clonedBook1 := clone1.(*prototype.Book)
+	clonedBook1.UpdateISBN("9780201633611")
+	clonedBook1.UpdatePrice(50.99)
+	fmt.Printf("Cloned book 1: %s\n", clonedBook1.GetDetails())
+
+	clone2, _ := manager.GetPrototype("design-patterns")
+	clonedBook2 := clone2.(*prototype.Book)
+	clonedBook2.UpdateStock(5)
+	fmt.Printf("Cloned book 2: %s\n", clonedBook2.GetDetails())
+
+	fmt.Printf("Original book after clones: %s\n", originalBook.GetDetails())
+}

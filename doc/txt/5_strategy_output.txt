@@ -1,0 +1,22 @@
+=== STRATEGY PATTERN ===
+Searching books using different Strategy patterns
+Catalog contains 5 books:
+  1. Clean Code by Robert C. Martin (ISBN: 9780132350884)
+  2. Refactoring by Martin Fowler (ISBN: 9780201485677)
+  3. The Pragmatic Programmer by Andrew Hunt (ISBN: 9780135957059)
+  4. Design Patterns by Erich Gamma (ISBN: 9780201633610)
+  5. Clean Architecture by Robert C. Martin (ISBN: 9780134494166)
+
+Search Results (Title Search) for 'Clean':
+  1. Clean Code by Robert C. Martin (ISBN: 9780132350884)
+  2. Clean Architecture by Robert C. Martin (ISBN: 9780134494166)
+  Found 2 result(s)
+
+Search Results (Author Search) for 'Robert':
+  1. Clean Code by Robert C. Martin (ISBN: 9780132350884)
+  2. Clean Architecture by Robert C. Martin (ISBN: 9780134494166)
+  Found 2 result(s)
+
+Search Results (Title Search) for 'Design':
+  1. Design Patterns by Erich Gamma (ISBN: 9780201633610)
+  Found 1 result(s)

@@ -1,0 +1,222 @@
+// ============================================================
+// STRATEGY PATTERN - Source Code
+// Library Management System
+// ============================================================
+
+// ============================================================
+// File: patterns/behavioral/strategy/search_strategy.go
+// ============================================================
+package strategy
+
+// SearchStrategy defines the interface for search algorithms
+type SearchStrategy interface {
+	Search(query string, books []Book) []Book
+	GetStrategyName() string
+}
+
+// ============================================================
+// File: patterns/behavioral/strategy/book.go
+// ============================================================
+package strategy
+
+// Book represents a book for searching
+type Book struct {
+	Title    string
+	Author   string
+	ISBN     string
+	Category string
+}
+
+// GetTitle returns the book title
+func (b *Book) GetTitle() string {
+	return b.Title
+}
+
+// GetAuthor returns the book author
+func (b *Book) GetAuthor() string {
+	return b.Author
+}
+
+// GetISBN returns the book ISBN
+func (b *Book) GetISBN() string {
+	return b.ISBN
+}
+
+// GetCategory returns the book category
+func (b *Book) GetCategory() string {
+	return b.Category
+}
+
+// ============================================================
+// File: patterns/behavioral/strategy/title_search.go
+// ============================================================
+package strategy
+
+import (
+	"strings"
+)
+
+// TitleSearchStrategy searches books by title
+type TitleSearchStrategy struct{}
+
+// NewTitleSearchStrategy creates a new title search strategy
+func NewTitleSearchStrategy() *TitleSearchStrategy {
+	return &TitleSearchStrategy{}
+}
+
+// Search searches for books by title (case-insensitive, partial match)
+func (tss *TitleSearchStrategy) Search(query string, books []Book) []Book {
+	results := make([]Book, 0)
+	lowerQuery := strings.ToLower(query)
+
+	for _, book := range books {
+		if strings.Contains(strings.ToLower(book.Title), lowerQuery) {
+			results = append(results, book)
+		}
+	}
+	return results
+}
+
+// GetStrategyName returns the strategy name
+func (tss *TitleSearchStrategy) GetStrategyName() string {
+	return "Title Search"
+}
+
+// ============================================================
+// File: patterns/behavioral/strategy/author_search.go
+// ============================================================
+package strategy
+
+import (
+	"strings"
+)
+
+// AuthorSearchStrategy searches books by author
+type AuthorSearchStrategy struct{}
+
+// NewAuthorSearchStrategy creates a new author search strategy
+func NewAuthorSearchStrategy() *AuthorSearchStrategy {
+	return &AuthorSearchStrategy{}
+}
+
+// Search searches for books by author (case-insensitive, partial match)
+func (ass *AuthorSearchStrategy) Search(query string, books []Book) []Book {
+	results := make([]Book, 0)
+	lowerQuery := strings.ToLower(query)
+
+	for _, book := range books {
+		if strings.Contains(strings.ToLower(book.Author), lowerQuery) {
+			results = append(results, book)
+		}
+	}
+	return results
+}
+
+// GetStrategyName returns the strategy name
+func (ass *AuthorSearchStrategy) GetStrategyName() string {
+	return "Author Search"
+}
+
+// ============================================================
+// File: patterns/behavioral/strategy/catalog.go
+// ============================================================
+package strategy
+
+import "fmt"
+
+// Catalog uses search strategy to find books
+type Catalog struct {
+	books    []Book
+	strategy SearchStrategy
+}
+
+// NewCatalog creates a new catalog with default TitleSearchStrategy
+func NewCatalog(books []Book) *Catalog {
+	return &Catalog{
+		books:    books,
+		strategy: NewTitleSearchStrategy(),
+	}
+}
+
+// SetStrategy changes the search strategy
+func (c *Catalog) SetStrategy(strategy SearchStrategy) {
+	c.strategy = strategy
+}
+
+// Find searches for books using the current strategy
+func (c *Catalog) Find(query string) []Book {
+	return c.strategy.Search(query, c.books)
+}
+
+// AddBook adds a book to the catalog
+func (c *Catalog) AddBook(book Book) {
+	c.books = append(c.books, book)
+}
+
+// GetAllBooks returns all books in the catalog
+func (c *Catalog) GetAllBooks() []Book {
+	return c.books
+}
+
+// GetBookCount returns the total number of books
+func (c *Catalog) GetBookCount() int {
+	return len(c.books)
+}
+
+// DisplayCatalog displays all books in the catalog
+func (c *Catalog) DisplayCatalog() {
+	fmt.Printf("Catalog contains %d books:\n", len(c.books))
+	for i, book := range c.books {
+		fmt.Printf("  %d. %s by %s (ISBN: %s)\n", i+1, book.Title, book.Author, book.ISBN)
+	}
+}
+
+// DisplayResults displays search results
+func (c *Catalog) DisplayResults(results []Book, query string) {
+	if c.strategy != nil {
+		fmt.Printf("\nSearch Results (%s) for '%s':\n", c.strategy.GetStrategyName(), query)
+	} else {
+		fmt.Printf("\nSearch Results for '%s':\n", query)
+	}
+
+	if len(results) == 0 {
+		fmt.Println("  No results found")
+		return
+	}
+
+	for i, book := range results {
+		fmt.Printf("  %d. %s by %s (ISBN: %s)\n", i+1, book.Title, book.Author, book.ISBN)
+	}
+	fmt.Printf("  Found %d result(s)\n", len(results))
+}
+
+// ============================================================
+// File: main.go - demoStrategyPattern()
+// ============================================================
+func demoStrategyPattern() {
+	fmt.Println("=== STRATEGY PATTERN ===")
+	fmt.Println("Searching books using different Strategy patterns")
+
+	books := []strategy.Book{
+		{Title: "Clean Code", Author: "Robert C. Martin", ISBN: "9780132350884", Category: "Technology"},
+		{Title: "Refactoring", Author: "Martin Fowler", ISBN: "9780201485677", Category: "Technology"},
+		{Title: "The Pragmatic Programmer", Author: "Andrew Hunt", ISBN: "9780135957059", Category: "Technology"},
+		{Title: "Design Patterns", Author: "Erich Gamma", ISBN: "9780201633610", Category: "Technology"},
+		{Title: "Clean Architecture", Author: "Robert C. Martin", ISBN: "9780134494166", Category: "Technology"},
+	}
+
+	catalog := strategy.NewCatalog(books)
+	catalog.DisplayCatalog()
+
+	catalog.SetStrategy(strategy.NewTitleSearchStrategy())
+	results := catalog.Find("Clean")
+	catalog.DisplayResults(results, "Clean")
+
+	catalog.SetStrategy(strategy.NewAuthorSearchStrategy())
+	results = catalog.Find("Robert")
+	catalog.DisplayResults(results, "Robert")
+
+	catalog.SetStrategy(strategy.NewTitleSearchStrategy())
+	results = catalog.Find("Design")
+	catalog.DisplayResults(results, "Design")
+}

@@ -1,0 +1,200 @@
+// ============================================================
+// BUILDER PATTERN - Source Code
+// Library Management System
+// ============================================================
+
+// ============================================================
+// File: patterns/creational/builder/book.go
+// ============================================================
+package builder
+
+import "fmt"
+
+// Book represents a book in the library
+type Book struct {
+	ID        string
+	Title     string
+	Author    string
+	ISBN      string
+	Publisher string
+	Category  string
+	PageCount int
+	Language  string
+	Published string
+	Tags      []string
+}
+
+// String returns a string representation of the book
+func (b *Book) String() string {
+	return fmt.Sprintf("Book{ID: %s, Title: %s, Author: %s, ISBN: %s}", b.ID, b.Title, b.Author, b.ISBN)
+}
+
+// ============================================================
+// File: patterns/creational/builder/book_builder.go
+// ============================================================
+package builder
+
+import "fmt"
+
+// BookBuilder is used to construct Book objects step by step
+type BookBuilder struct {
+	book *Book
+}
+
+// NewBookBuilder creates a new BookBuilder with default values
+func NewBookBuilder() *BookBuilder {
+	return &BookBuilder{
+		book: &Book{
+			ID:        generateID(),
+			PageCount: 0,
+			Language:  "English",
+			Tags:      []string{},
+		},
+	}
+}
+
+// SetTitle sets the book title (required)
+func (b *BookBuilder) SetTitle(title string) *BookBuilder {
+	b.book.Title = title
+	return b
+}
+
+// SetAuthor sets the book author (required)
+func (b *BookBuilder) SetAuthor(author string) *BookBuilder {
+	b.book.Author = author
+	return b
+}
+
+// SetISBN sets the ISBN of the book
+func (b *BookBuilder) SetISBN(isbn string) *BookBuilder {
+	b.book.ISBN = isbn
+	return b
+}
+
+// SetPublisher sets the publisher of the book
+func (b *BookBuilder) SetPublisher(publisher string) *BookBuilder {
+	b.book.Publisher = publisher
+	return b
+}
+
+// SetCategory sets the category of the book
+func (b *BookBuilder) SetCategory(category string) *BookBuilder {
+	b.book.Category = category
+	return b
+}
+
+// SetPageCount sets the number of pages
+func (b *BookBuilder) SetPageCount(count int) *BookBuilder {
+	b.book.PageCount = count
+	return b
+}
+
+// SetLanguage sets the language of the book
+func (b *BookBuilder) SetLanguage(language string) *BookBuilder {
+	b.book.Language = language
+	return b
+}
+
+// SetPublished sets the publication date
+func (b *BookBuilder) SetPublished(published string) *BookBuilder {
+	b.book.Published = published
+	return b
+}
+
+// AddTag adds a tag to the book
+func (b *BookBuilder) AddTag(tag string) *BookBuilder {
+	b.book.Tags = append(b.book.Tags, tag)
+	return b
+}
+
+// Build creates the final Book object
+// Returns a new copy of the book to avoid shared reference issues
+// Returns an error if required fields are missing
+func (b *BookBuilder) Build() (*Book, error) {
+	// Validate required fields
+	if b.book.Title == "" {
+		return nil, fmt.Errorf("title is required")
+	}
+	if b.book.Author == "" {
+		return nil, fmt.Errorf("author is required")
+	}
+
+	// Return a copy, not the internal reference
+	tags := make([]string, len(b.book.Tags))
+	copy(tags, b.book.Tags)
+
+	result := &Book{
+		ID:        b.book.ID,
+		Title:     b.book.Title,
+		Author:    b.book.Author,
+		ISBN:      b.book.ISBN,
+		Publisher: b.book.Publisher,
+		Category:  b.book.Category,
+		PageCount: b.book.PageCount,
+		Language:  b.book.Language,
+		Published: b.book.Published,
+		Tags:      tags,
+	}
+
+	return result, nil
+}
+
+var bookCount int
+
+func init() {
+	bookCount = 0
+}
+
+// generateID generates a unique ID for the book using counter
+func generateID() string {
+	bookCount++
+	return fmt.Sprintf("BK-%d", bookCount)
+}
+
+// ============================================================
+// File: main.go - demoBuilderPattern()
+// ============================================================
+func demoBuilderPattern() {
+	fmt.Println("=== BUILDER PATTERN ===")
+	fmt.Println("Creating books using Builder pattern with method chaining")
+
+	book1, _ := builder.NewBookBuilder().
+		SetTitle("1984").
+		SetAuthor("George Orwell").
+		SetISBN("9780451524935").
+		SetPublisher("Signet Classic").
+		SetCategory("Fiction").
+		SetPageCount(328).
+		SetLanguage("English").
+		SetPublished("1949").
+		AddTag("Dystopian").
+		AddTag("Classic").
+		Build()
+
+	fmt.Printf("Created: %s\n", book1)
+
+	book2, _ := builder.NewBookBuilder().
+		SetTitle("Clean Code").
+		SetAuthor("Robert C. Martin").
+		SetISBN("9780132350884").
+		SetCategory("Technology").
+		SetPageCount(464).
+		Build()
+
+	fmt.Printf("Created: %s\n", book2)
+
+	book3, _ := builder.NewBookBuilder().
+		SetTitle("The Great Gatsby").
+		SetAuthor("F. Scott Fitzgerald").
+		Build()
+
+	fmt.Printf("Created: %s\n", book3)
+
+	bookWithoutTitle, err := builder.NewBookBuilder().
+		SetAuthor("Test Author").
+		Build()
+	if err != nil {
+		fmt.Printf("Validation Error: %s\n", err)
+	}
+	fmt.Printf("Book without title: %v\n", bookWithoutTitle)
+}
